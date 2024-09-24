@@ -1,10 +1,11 @@
 import React from 'react';
-import MultiStepForm from './components/MultiStepsForm';
+import ReservationForm from './components/InputForm';
 
 function App() {
   return (
     <div className="App">
-      <MultiStepForm />
+      <ReservationForm />
+      
     </div>
   );
 }
