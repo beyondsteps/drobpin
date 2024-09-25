@@ -1,35 +1,54 @@
 import React, { useState } from 'react';
-import useMultiStepForm from '../hooks/useMultiStepForm';
-import StepOne from './StepOne';
-import StepTwo from './StepTwo';
+import Step1 from './Step1';
+import Step2 from './Step2';
+import Step3 from './Step3';
 
-function MultiStepForm() {
-  // 폼 데이터를 관리하는 상태
-  const [formData, setFormData] = useState({ name: '', email: '' });
+export default function InputForm() {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    이름: "",
+    나이: "",
+    성별: "",
+    연락처: "",
+    체험날짜: "",
+    체험유형: "",
+    입금여부: "현장 결제",
+    inflow: "1",
+  });
 
-  // 단계별로 나눠진 폼 컴포넌트
-  const steps = [
-    <StepOne formData={formData} setFormData={setFormData} />,
-    <StepTwo formData={formData} setFormData={setFormData} />,
-  ];
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1);
 
-  const { currentStepIndex, step, next, back } = useMultiStepForm(steps);
+  const handleSubmit = async (data) => {
+    try {
+      const response = await fetch('http://localhost:5678/webhook-test/info-insert', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': 'd15c9bbb0d6e46a2974d9ec28cce3093',
+        },
+        body: JSON.stringify(data), // formData 대신 data 사용
+      });
 
-  return (
-    <div>
-      <h1>Multi-Step Form</h1>
-      {step}  {/* 현재 단계의 컴포넌트를 렌더링 */}
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("전송 성공:", responseData);
+      } else {
+        console.error("전송 실패 :", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error During Sending Data:", error);
+    }
+  };
 
-      <div>
-        <button disabled={currentStepIndex === 0} onClick={back}>
-          Back
-        </button>
-        <button onClick={next}>
-          {currentStepIndex === steps.length - 1 ? 'Submit' : 'Next'}
-        </button>
-      </div>
-    </div>
-  );
+  switch (step) {
+    case 1:
+      return <Step1 formData={formData} setFormData={setFormData} nextStep={nextStep} />;
+    case 2:
+      return <Step2 formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />;
+    case 3:
+      return <Step3 formData={formData} setFormData={setFormData} prevStep={prevStep} handleSubmit={handleSubmit} />;
+    default:
+      return null;
+  }
 }
-
-export default MultiStepForm;
