@@ -1,5 +1,5 @@
 # 베이스 이미지 설정
-FROM registry.access.redhat.com/ubi8/nodejs-16:latest
+FROM registry.access.redhat.com/ubi8/nodejs-18:latest
 
 # 작업 디렉토리 설정
 WORKDIR /opt/app-root/src
